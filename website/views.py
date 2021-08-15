@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, jsonify
+from flask import Blueprint, render_template, request, flash, jsonify,redirect
 from flask_login import login_required, current_user
 from .models import Note
 from . import db
@@ -35,3 +35,19 @@ def delete_note():
             db.session.commit()
 
     return jsonify({})
+@views.route('/update-note/<id>', methods=['POST','GET'])
+def update_note(id):
+
+    noteId = Note.query.get_or_404(id)
+    if request.method=='POST':
+        noteId.data=request.form['note']
+        try:
+
+            db.session.commit()
+            return  redirect('/')
+        except:
+            return """Update can't happen"""
+
+
+    else:
+        return  render_template('update.html',task=noteId,user=current_user)
